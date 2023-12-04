@@ -1,0 +1,29 @@
+version: '3.0'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - SERVICES=sqs,sns
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+    ports:
+      - '4566-4597:4566-4597'
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - nathalie_project_network
+
+  aws-cli:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - localstack
+    networks:
+      - nathalie_project_network
+
+networks:
+  nathalie_project_network:
+    external: true
